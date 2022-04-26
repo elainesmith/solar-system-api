@@ -1,4 +1,3 @@
-from unicodedata import name
 from flask import Blueprint, jsonify
 
 
@@ -25,3 +24,19 @@ def get_all_planets():
                              "description": planet.description})
 
     return jsonify(planet_reply)
+
+@planet_bp.route("<planet_id>", methods=["GET"])
+def get_one_planet(planet_id):
+    try:
+        planet_id = int(planet_id)
+    except ValueError:
+        return {"msg": f"Planet ID must be numerical: {planet_id}"}, 400
+    
+    for planet in planets:
+        if planet.id == planet_id:
+            return {
+                "id": planet.id,
+                "name": planet.name,
+                "description": planet.description
+            }
+    return {"msg": f"Planet ID not found: {planet_id}"}, 404
