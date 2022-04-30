@@ -1,3 +1,4 @@
+from pydoc import describe
 from flask import Blueprint, jsonify, make_response, request
 from app import db
 from app.models.planet import Planet
@@ -18,6 +19,16 @@ def create_one_planet():
 
     return make_response(f"Planet {new_planet.name} succesfully created.  Good job spaceman!", 201)
 
+
+@planet_bp.route("", methods=["GET"])
+def get_all_planets():
+    planets_reply = []
+    planets = Planet.query.all()
+    for planet in planets:
+        planets_reply.append({"name": planet.name,
+                              "decsr": planet.descr,
+                              "num_of_starbucks": planet.num_of_starbucks})
+    return jsonify(planets_reply)
 
 # @planet_bp.route("", methods=["GET"])
 # def get_all_planets():
