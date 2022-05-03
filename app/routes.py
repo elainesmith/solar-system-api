@@ -1,4 +1,3 @@
-from pydoc import describe
 from flask import Blueprint, jsonify, make_response, request
 from app import db
 from app.models.planet import Planet
@@ -19,27 +18,39 @@ def create_one_planet():
 
     return make_response(f"Planet {new_planet.name} succesfully created.  Good job spaceman!", 201)
 
-
 @planet_bp.route("", methods=["GET"])
 def get_all_planets():
     planets_reply = []
     planets = Planet.query.all()
     for planet in planets:
         planets_reply.append({"name": planet.name,
-                              "decsr": planet.descr,
+                              "descr": planet.descr,
                               "num_of_starbucks": planet.num_of_starbucks})
     return jsonify(planets_reply)
 
-# @planet_bp.route("", methods=["GET"])
-# def get_all_planets():
-#     planet_reply = []
-#     for planet in planets:
-#         planet_reply.append({"id": planet.id,
-#                              "name": planet.name,
-#                              "description": planet.description})
+def validate_planet(planet_id):
+    try:
+        planet_id = int(planet_id)
+    except ValueError:
+        return {"msg": f"Planet ID must be numerical: {planet_id}"}, 400
 
-#     return jsonify(planet_reply)
+    planet = Planet.query.get(planet_id)
 
+    if not planet:
+        return {"msg": f"Planet ID not found: {planet_id}"}, 404
+    
+    return planet
+
+@planet_bp.route("/<planet_id>", methods=["GET"])
+def get_one_planet(planet_id):
+    planet = validate_planet(planet_id)
+
+    return {
+        "id": planet.id,
+        "name": planet.name,
+        "descr": planet.descr,
+        "num_of_starbucks": planet.num_of_starbucks
+    }
 
 # @planet_bp.route("<planet_id>", methods=["GET"])
 # def get_one_planet(planet_id):
