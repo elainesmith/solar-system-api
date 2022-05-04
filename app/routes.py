@@ -35,8 +35,20 @@ def create_one_planet():
 
 @planet_bp.route("", methods=["GET"])
 def get_all_planets():
+
+    params = request.args
+    if not params:
+        planets = Planet.query.all()
+    elif "name" in params:
+        found_name = params["name"]
+        planets = Planet.query.filter_by(name=found_name)
+    elif "num_of_starbucks" in params:
+        found_starbucks = params["num_of_starbucks"]
+        planets = Planet.query.filter_by(num_of_starbucks=found_starbucks)
+    else: 
+        return {"msg": "Sorry spaceman, search elsewhere."}
+
     planets_reply = []
-    planets = Planet.query.all()
     for planet in planets:
         planets_reply.append({"name": planet.name,
                               "descr": planet.descr,
@@ -89,18 +101,4 @@ def explode_one_planet(planet_id):
 
     return {"msg": f"{planet.name} exploded"}, 200
 
-# @planet_bp.route("<planet_id>", methods=["GET"])
-# def get_one_planet(planet_id):
-#     try:
-#         planet_id = int(planet_id)
-#     except ValueError:
-#         return {"msg": f"Planet ID must be numerical: {planet_id}"}, 400
 
-#     for planet in planets:
-#         if planet.id == planet_id:
-#             return {
-#                 "id": planet.id,
-#                 "name": planet.name,
-#                 "description": planet.description
-#             }
-#     return {"msg": f"Planet ID not found: {planet_id}"}, 404
