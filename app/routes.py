@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, make_response, request
+from sqlalchemy import func
 from app import db
 from app.models.planet import Planet
 
@@ -41,7 +42,7 @@ def get_all_planets():
         planets = Planet.query.all()
     elif "name" in params:
         found_name = params["name"]
-        planets = Planet.query.filter_by(name=found_name)
+        planets = Planet.query.filter(func.lower(Planet.name)==func.lower(found_name))
     elif "num_of_starbucks" in params:
         found_starbucks = params["num_of_starbucks"]
         planets = Planet.query.filter_by(num_of_starbucks=found_starbucks)
